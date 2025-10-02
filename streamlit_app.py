@@ -384,9 +384,7 @@ def show_login_form():
         name = st.text_input("Your Name*")
         email = st.text_input("Your Email*")
         
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            submit = st.form_submit_button("Login", use_container_width=True)
+        submit = st.form_submit_button("Login", use_container_width=True)
         
         if submit:
             if name and email:

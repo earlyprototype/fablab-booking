@@ -148,25 +148,26 @@ def show_equipment_calendar(equipment: dict):
                          and b["status"] != "cancelled"]
     
     # Create calendar grid with equipment info and contact details side by side
-    header_col1, header_col2, header_col3 = st.columns([2, 2, 2])
+    header_col1, header_col2, header_col3, header_col4 = st.columns([2, 2, 2, 2])
     
     with header_col1:
         st.markdown(f"### {equipment['name']}")
         st.markdown(f"*{equipment['description']}*")
-        st.markdown("**📧 Booking Manager:** [carl@creativespark.ie](mailto:carl@creativespark.ie)")
     
     with header_col2:
-        st.markdown("**🕐 Operating Hours**")
-        st.markdown("Monday - Friday")
-        st.markdown("9:00 AM - 5:00 PM")
+        st.markdown("<div style='text-align: center;'><strong>🕐 Operating Hours</strong></div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: center;'>Monday - Friday</div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: center;'>9:00 AM - 5:00 PM</div>", unsafe_allow_html=True)
     
     with header_col3:
-        st.markdown("**⏱️ Booking Info**")
-        st.markdown("30-minute slots")
-        st.markdown("Max 4 hours per booking")
-        
-    # General Enquiries row - aligned left across all columns
-    st.markdown("**💬 General Enquiries:** [hello@creativespark.ie](mailto:hello@creativespark.ie)")
+        st.markdown("<div style='text-align: center;'><strong>⏱️ Booking Info</strong></div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: center;'>30-minute slots</div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: center;'>Max 4 hours per booking</div>", unsafe_allow_html=True)
+    
+    with header_col4:
+        st.markdown("<div style='text-align: center;'><strong>📧 Email Addresses</strong></div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: center;'><strong>Booking Manager:</strong><br><a href='mailto:carl@creativespark.ie'>carl@creativespark.ie</a></div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: center;'><strong>General Enquiries:</strong><br><a href='mailto:hello@creativespark.ie'>hello@creativespark.ie</a></div>", unsafe_allow_html=True)
     
     st.markdown("---")
     
@@ -255,12 +256,12 @@ def show_equipment_calendar(equipment: dict):
                                 break
                         
                         if booked_by_user:
-                            # Light blue for user's bookings
-                            st.markdown("<div style='background-color: #95B3A8; height: 35px; border-radius: 3px; cursor: not-allowed; border: 1.5px solid #6B8E7F;'></div>",
+                            # Soft Amber for user's bookings
+                            st.markdown("<div style='background-color: #F3C78F; height: 35px; border-radius: 3px; cursor: not-allowed; border: 1.5px solid #E8B67F;'></div>",
                                       unsafe_allow_html=True)
                         elif booked_by_other:
-                            # Red for other bookings
-                            st.markdown("<div style='background-color: #D4DDD7; height: 35px; border-radius: 3px; cursor: not-allowed; border: 1.5px solid #B5C4BA;'></div>",
+                            # Dark Amber for other bookings
+                            st.markdown("<div style='background-color: #C68642; height: 35px; border-radius: 3px; cursor: not-allowed; border: 1.5px solid #B57838;'></div>",
                                       unsafe_allow_html=True)
                         else:
                             # White with thin black border for available (clickable)
@@ -644,7 +645,12 @@ def main():
                 margin-bottom: 24px;
                 border-left: 4px solid #6B8E7F;'>
         <h3 style='margin: 0; color: #2C3E36; font-size: 1.3rem;'>💡 Click any start time to book equipment</h3>
-        <p style='margin: 8px 0 0 0; color: #4A6759;'>⬜ Available  |  ⬜ Booked by Others  |  🟩 Your Bookings  |  ⬜ Weekend (Closed)</p>
+        <p style='margin: 8px 0 0 0; color: #4A6759;'>
+            <span style='display: inline-block; width: 18px; height: 18px; background: white; border: 1.5px solid #6B8E7F; border-radius: 2px; vertical-align: middle;'></span> Available  |  
+            <span style='display: inline-block; width: 18px; height: 18px; background: #C68642; border-radius: 2px; vertical-align: middle;'></span> Booked by Others  |  
+            <span style='display: inline-block; width: 18px; height: 18px; background: #F3C78F; border-radius: 2px; vertical-align: middle;'></span> Your Bookings  |  
+            <span style='display: inline-block; width: 18px; height: 18px; background: #E8EDE8; border: 1.5px solid #D4DDD7; border-radius: 2px; vertical-align: middle;'></span> Weekend (Closed)
+        </p>
     </div>
     """, unsafe_allow_html=True)
     

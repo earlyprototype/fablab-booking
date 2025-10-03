@@ -21,7 +21,7 @@ API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8300")
 # Page configuration
 st.set_page_config(
     page_title="FabLab Equipment Booking",
-    page_icon="🏭",
+    page_icon="🛠️",
     layout="wide"
 )
 
@@ -192,11 +192,11 @@ def show_equipment_calendar(equipment: dict):
                 is_today = date == datetime.now().date()
                 
                 if is_weekend:
-                    st.markdown(f"<div style='text-align: center; background-color: #E0E0E0; padding: 8px; border-radius: 5px;'>"
+                    st.markdown(f"<div style='text-align: center; background-color: #E8EDE8; padding: 8px; border-radius: 5px;'>"
                               f"<small>{day_name}</small><br><b>{day_num}</b><br><small>{month}</small></div>",
                               unsafe_allow_html=True)
                 elif is_today:
-                    st.markdown(f"<div style='text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 8px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>"
+                    st.markdown(f"<div style='text-align: center; background: #D4DDD7; color: #4A6759; padding: 8px; border-radius: 8px;'>"
                               f"<small style='opacity: 0.9;'>{day_name}</small><br><b style='font-size: 1.2rem;'>{day_num}</b><br><small style='opacity: 0.9;'>TODAY</small></div>",
                               unsafe_allow_html=True)
                 else:
@@ -210,25 +210,25 @@ def show_equipment_calendar(equipment: dict):
         for idx, time_slot in enumerate(time_slots):
             # Add AM/PM divider
             if time_slot == "09:00":
-                st.markdown("""<div style='background: linear-gradient(90deg, transparent, #e1e4e8 20%, #e1e4e8 80%, transparent); 
+                st.markdown("""<div style='background: linear-gradient(90deg, transparent, #D4DDD7 20%, #D4DDD7 80%, transparent); 
                             height: 2px; margin: 12px 0;'></div>
-                            <div style='text-align: center; color: #6b7280; font-weight: 600; font-size: 0.9rem; 
+                            <div style='text-align: center; color: #4A6759; font-weight: 600; font-size: 0.9rem; 
                             margin: 8px 0; letter-spacing: 1px;'>☀️ MORNING (9:00 AM - 12:00 PM)</div>
-                            <div style='background: linear-gradient(90deg, transparent, #e1e4e8 20%, #e1e4e8 80%, transparent); 
+                            <div style='background: linear-gradient(90deg, transparent, #D4DDD7 20%, #D4DDD7 80%, transparent); 
                             height: 2px; margin: 12px 0 16px 0;'></div>""", unsafe_allow_html=True)
             elif time_slot == "12:00":
-                st.markdown("""<div style='background: linear-gradient(90deg, transparent, #fbbf24 20%, #fbbf24 80%, transparent); 
+                st.markdown("""<div style='background: linear-gradient(90deg, transparent, #B5C4BA 20%, #B5C4BA 80%, transparent); 
                             height: 2px; margin: 12px 0;'></div>
-                            <div style='text-align: center; color: #92400e; font-weight: 600; font-size: 0.9rem; 
+                            <div style='text-align: center; color: #4A6759; font-weight: 600; font-size: 0.9rem; 
                             margin: 8px 0; letter-spacing: 1px;'>☀️ AFTERNOON (12:00 PM - 5:00 PM)</div>
-                            <div style='background: linear-gradient(90deg, transparent, #fbbf24 20%, #fbbf24 80%, transparent); 
+                            <div style='background: linear-gradient(90deg, transparent, #B5C4BA 20%, #B5C4BA 80%, transparent); 
                             height: 2px; margin: 12px 0 16px 0;'></div>""", unsafe_allow_html=True)
             
             cols = st.columns([0.5] + [1] * len(dates))
             
             # Time label (on one line)
             with cols[0]:
-                st.markdown(f"<div style='text-align: right; padding-right: 10px; font-weight: 600; color: #4b5563; white-space: nowrap;'>{time_slot}</div>",
+                st.markdown(f"<div style='text-align: right; padding-right: 10px; font-weight: 600; color: #4A6759; white-space: nowrap;'>{time_slot}</div>",
                           unsafe_allow_html=True)
             
             # Date cells
@@ -239,7 +239,7 @@ def show_equipment_calendar(equipment: dict):
                     
                     if is_weekend:
                         # Grey out weekends
-                        st.markdown("<div style='background-color: #E0E0E0; height: 35px; border-radius: 3px; border: 1.5px solid #c0c0c0;'></div>",
+                        st.markdown("<div style='background-color: #E8EDE8; height: 35px; border-radius: 3px; border: 1.5px solid #D4DDD7;'></div>",
                                   unsafe_allow_html=True)
                     else:
                         # Check if booked
@@ -256,18 +256,18 @@ def show_equipment_calendar(equipment: dict):
                         
                         if booked_by_user:
                             # Light blue for user's bookings
-                            st.markdown("<div style='background-color: #ADD8E6; height: 35px; border-radius: 3px; cursor: not-allowed; border: 1.5px solid #7fb3d5;'></div>",
+                            st.markdown("<div style='background-color: #95B3A8; height: 35px; border-radius: 3px; cursor: not-allowed; border: 1.5px solid #6B8E7F;'></div>",
                                       unsafe_allow_html=True)
                         elif booked_by_other:
                             # Red for other bookings
-                            st.markdown("<div style='background-color: #FF4444; height: 35px; border-radius: 3px; cursor: not-allowed; border: 1.5px solid #cc0000;'></div>",
+                            st.markdown("<div style='background-color: #D4DDD7; height: 35px; border-radius: 3px; cursor: not-allowed; border: 1.5px solid #B5C4BA;'></div>",
                                       unsafe_allow_html=True)
                         else:
                             # White with thin black border for available (clickable)
                             button_html = f"""
                             <button onclick="window.location.href='?book={equipment['id']}_{date_str}_{time_slot}'" 
                                     style='width: 100%; height: 30px; background-color: white; 
-                                           border: 1px solid #000000; border-radius: 3px; 
+                                           border: 1.5px solid #6B8E7F; border-radius: 3px; 
                                            cursor: pointer;'
                                     title='Book {equipment['name']} on {date_str} at {time_slot}'>
                             </button>
@@ -492,13 +492,13 @@ def main():
     }
     
     .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] {
-        background-color: #0066cc !important;
+        background-color: #6B8E7F !important;
         color: white !important;
         box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
     }
     
     .stTabs [data-baseweb="tab-list"] button:hover {
-        background-color: #e8f2ff !important;
+        background-color: #E8EDE8 !important;
         transform: translateY(-2px);
     }
     
@@ -512,8 +512,8 @@ def main():
     }
     
     .stButton button:hover {
-        background-color: #f0f9ff !important;
-        border-color: #0066cc !important;
+        background-color: #F5F7F5 !important;
+        border-color: #6B8E7F !important;
         transform: scale(1.05) !important;
         box-shadow: 0 2px 4px rgba(0, 102, 204, 0.1) !important;
     }
@@ -526,14 +526,14 @@ def main():
     }
     
     .stTextInput input:focus, .stTextArea textarea:focus {
-        border-color: #0066cc !important;
+        border-color: #6B8E7F !important;
         box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1) !important;
     }
     
     /* Success message styling */
     .stSuccess {
-        background-color: #d1fae5 !important;
-        border-left: 4px solid #10b981 !important;
+        background-color: #E8EDE8 !important;
+        border-left: 4px solid #6B8E7F !important;
         border-radius: 8px !important;
         padding: 16px !important;
         animation: slideIn 0.3s ease;
@@ -541,34 +541,31 @@ def main():
     
     /* Error message styling */
     .stError {
-        background-color: #fee2e2 !important;
-        border-left: 4px solid #ef4444 !important;
+        background-color: #F5E8E8 !important;
+        border-left: 4px solid #A67B7B !important;
         border-radius: 8px !important;
         padding: 16px !important;
     }
     
     /* Info message styling */
     .stInfo {
-        background-color: #dbeafe !important;
-        border-left: 4px solid #3b82f6 !important;
+        background-color: #E8EDE8 !important;
+        border-left: 4px solid #6B8E7F !important;
         border-radius: 8px !important;
         padding: 16px !important;
     }
     
     /* Sidebar improvements */
     [data-testid="stSidebar"] {
-        background-color: #f8f9fa;
-        border-right: 2px solid #e1e4e8;
+        background-color: #F5F7F5;
+        border-right: 2px solid #D4DDD7;
     }
     
     /* Login form centering */
     .login-container {
-        max-width: 450px;
+        max-width: 400px;
         margin: 60px auto;
-        padding: 40px;
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 0px;
     }
     
     /* Animation keyframes */
@@ -610,7 +607,7 @@ def main():
     </style>
     """, unsafe_allow_html=True)
     
-    st.title("🏭 FabLab Equipment Booking")
+    st.title("🛠️ FabLab Equipment Booking")
     
     # Sidebar (always show)
     show_my_bookings_sidebar()
@@ -638,16 +635,16 @@ def main():
     
     st.markdown("---")
     
-    # Main instruction with flat pale blue styling
+    # Main instruction with flat muted sage styling
     st.markdown("""
-    <div style='background: #e6f2ff; 
+    <div style='background: #E8EDE8; 
                 padding: 20px; 
                 border-radius: 0px; 
-                color: #1a1a1a; 
+                color: #2C3E36; 
                 margin-bottom: 24px;
-                border-left: 4px solid #0066cc;'>
-        <h3 style='margin: 0; color: #1a1a1a; font-size: 1.3rem;'>💡 Click any start time to book equipment</h3>
-        <p style='margin: 8px 0 0 0; color: #4b5563;'>⬜ Available  |  🔴 Booked by Others  |  🔵 Your Bookings  |  ⬜ Weekend (Closed)</p>
+                border-left: 4px solid #6B8E7F;'>
+        <h3 style='margin: 0; color: #2C3E36; font-size: 1.3rem;'>💡 Click any start time to book equipment</h3>
+        <p style='margin: 8px 0 0 0; color: #4A6759;'>⬜ Available  |  ⬜ Booked by Others  |  🟩 Your Bookings  |  ⬜ Weekend (Closed)</p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -664,7 +661,7 @@ def main():
     
     # Footer
     st.markdown("---")
-    st.markdown("<div style='text-align: center; color: #6b7280; font-size: 0.9rem;'>© 2024 Creative Spark FabLab | Powered by FactoryXChange</div>", unsafe_allow_html=True)
+    st.markdown("<div style='text-align: center; color: #4A6759; font-size: 0.9rem;'>© 2024 Creative Spark FabLab | Powered by FactoryXChange</div>", unsafe_allow_html=True)
 
 
 if __name__ == "__main__":

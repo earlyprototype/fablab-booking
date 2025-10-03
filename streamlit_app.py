@@ -21,7 +21,7 @@ API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8300")
 # Page configuration
 st.set_page_config(
     page_title="FabLab Equipment Booking",
-    page_icon="🛠️",
+    page_icon="image.png",
     layout="wide"
 )
 
@@ -166,8 +166,8 @@ def show_equipment_calendar(equipment: dict):
     
     with header_col4:
         st.markdown("<div style='text-align: center;'><strong>📧 Email Addresses</strong></div>", unsafe_allow_html=True)
-        st.markdown("<div style='text-align: center;'><strong>Booking Manager:</strong><br><a href='mailto:carl@creativespark.ie'>carl@creativespark.ie</a></div>", unsafe_allow_html=True)
-        st.markdown("<div style='text-align: center;'><strong>General Enquiries:</strong><br><a href='mailto:hello@creativespark.ie'>hello@creativespark.ie</a></div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: center;'><strong>Booking Manager:</strong> <a href='mailto:carl@creativespark.ie'>carl@creativespark.ie</a></div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: center;'><strong>General Enquiries:</strong> <a href='mailto:hello@creativespark.ie'>hello@creativespark.ie</a></div>", unsafe_allow_html=True)
     
     st.markdown("---")
     
@@ -193,7 +193,7 @@ def show_equipment_calendar(equipment: dict):
                 is_today = date == datetime.now().date()
                 
                 if is_weekend:
-                    st.markdown(f"<div style='text-align: center; background-color: #E8EDE8; padding: 8px; border-radius: 5px;'>"
+                    st.markdown(f"<div style='text-align: center; background-color: #9CA3AF; padding: 8px; border-radius: 5px;'>"
                               f"<small>{day_name}</small><br><b>{day_num}</b><br><small>{month}</small></div>",
                               unsafe_allow_html=True)
                 elif is_today:
@@ -240,7 +240,7 @@ def show_equipment_calendar(equipment: dict):
                     
                     if is_weekend:
                         # Grey out weekends
-                        st.markdown("<div style='background-color: #E8EDE8; height: 35px; border-radius: 3px; border: 1.5px solid #D4DDD7;'></div>",
+                        st.markdown("<div style='background-color: #9CA3AF; height: 35px; border-radius: 3px; border: 1.5px solid #6B7280;'></div>",
                                   unsafe_allow_html=True)
                     else:
                         # Check if booked
@@ -474,33 +474,37 @@ def main():
         font-size: 1.4rem !important;
     }
     
-    /* Larger, more prominent tabs */
+    /* Integrated tab styling */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-        background-color: #f8f9fa;
-        padding: 12px;
-        border-radius: 12px;
-        border: 1px solid #e1e4e8;
+        gap: 0px;
+        background-color: transparent;
+        padding: 0px;
+        border-radius: 0px;
+        border-bottom: 2px solid #D4DDD7;
     }
     
     .stTabs [data-baseweb="tab-list"] button {
         height: 50px;
         padding: 0 24px;
-        border-radius: 8px;
-        font-weight: 600;
+        border-radius: 0px;
+        border-bottom: 3px solid transparent;
+        font-weight: 500;
         font-size: 16px;
         transition: all 0.2s ease;
+        color: #4A6759 !important;
+        background-color: transparent !important;
     }
     
     .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] {
-        background-color: #6B8E7F !important;
-        color: white !important;
-        box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
+        background-color: #F5F7F5 !important;
+        color: #6B8E7F !important;
+        border-bottom: 3px solid #6B8E7F !important;
+        font-weight: 600;
     }
     
     .stTabs [data-baseweb="tab-list"] button:hover {
-        background-color: #E8EDE8 !important;
-        transform: translateY(-2px);
+        background-color: #F5F7F5 !important;
+        border-bottom: 3px solid #B5C4BA !important;
     }
     
     /* Better button styling for calendar slots */
@@ -608,7 +612,15 @@ def main():
     </style>
     """, unsafe_allow_html=True)
     
-    st.title("🛠️ FabLab Equipment Booking")
+    # Header with logo
+    header_left, header_right = st.columns([4, 1])
+    with header_left:
+        st.title("FabLab Equipment Booking")
+    with header_right:
+        try:
+            st.image("image.png", width=150)
+        except:
+            pass  # If logo not found, just skip it
     
     # Sidebar (always show)
     show_my_bookings_sidebar()
@@ -649,7 +661,7 @@ def main():
             <span style='display: inline-block; width: 18px; height: 18px; background: white; border: 1.5px solid #6B8E7F; border-radius: 2px; vertical-align: middle;'></span> Available  |  
             <span style='display: inline-block; width: 18px; height: 18px; background: #C68642; border-radius: 2px; vertical-align: middle;'></span> Booked by Others  |  
             <span style='display: inline-block; width: 18px; height: 18px; background: #F3C78F; border-radius: 2px; vertical-align: middle;'></span> Your Bookings  |  
-            <span style='display: inline-block; width: 18px; height: 18px; background: #E8EDE8; border: 1.5px solid #D4DDD7; border-radius: 2px; vertical-align: middle;'></span> Weekend (Closed)
+            <span style='display: inline-block; width: 18px; height: 18px; background: #9CA3AF; border: 1.5px solid #6B7280; border-radius: 2px; vertical-align: middle;'></span> Weekend (Closed)
         </p>
     </div>
     """, unsafe_allow_html=True)

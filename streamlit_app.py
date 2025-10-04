@@ -876,7 +876,7 @@ def main():
     
     /* Login form centering */
     .login-container {
-        max-width: 300px;
+        max-width: 220px;
         margin: 60px auto;
         padding: 0px;
     }

@@ -36,6 +36,10 @@ if "user_name" not in st.session_state:
     st.session_state.user_name = ""
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
+if "is_admin" not in st.session_state:
+    st.session_state.is_admin = False
+if "show_admin_dashboard" not in st.session_state:
+    st.session_state.show_admin_dashboard = False
 
 
 def send_booking_email(booking: dict) -> bool:
@@ -389,7 +393,12 @@ def show_login_form():
                     st.session_state.user_name = name
                     st.session_state.user_email = email
                     st.session_state.logged_in = True
-                    st.success(f"Welcome, {name}!")
+                    # Check if admin (Carl's email)
+                    st.session_state.is_admin = (email.lower() == "carl@creativespark.ie")
+                    if st.session_state.is_admin:
+                        st.success(f"Welcome, {name}! (Admin Access)")
+                    else:
+                        st.success(f"Welcome, {name}!")
                     st.rerun()
                 else:
                     st.error("Please enter a valid email address")
@@ -410,7 +419,20 @@ def show_my_bookings_sidebar():
                 st.session_state.logged_in = False
                 st.session_state.user_name = ""
                 st.session_state.user_email = ""
+                st.session_state.is_admin = False
+                st.session_state.show_admin_dashboard = False
                 st.rerun()
+            
+            # Admin dashboard button
+            if st.session_state.is_admin:
+                if st.session_state.show_admin_dashboard:
+                    if st.button("📅 Back to Booking Calendar", use_container_width=True, type="primary"):
+                        st.session_state.show_admin_dashboard = False
+                        st.rerun()
+                else:
+                    if st.button("👨‍💼 Admin Dashboard", use_container_width=True, type="primary"):
+                        st.session_state.show_admin_dashboard = True
+                        st.rerun()
             
             st.markdown("---")
         
@@ -436,6 +458,174 @@ def show_my_bookings_sidebar():
                     st.session_state.booking_manager.cancel_booking(booking['id'])
                     st.success("Cancelled")
                     st.rerun()
+
+
+def show_admin_dashboard():
+    """Admin dashboard for Carl to view all bookings and analytics"""
+    st.title("👨‍💼 Admin Dashboard")
+    st.markdown("**Manager:** Carl McAteer | **Email:** carl@creativespark.ie")
+    st.markdown("---")
+    
+    # Get all bookings
+    all_bookings = st.session_state.booking_manager.load_bookings()
+    active_bookings = [b for b in all_bookings if b["status"] != "cancelled"]
+    
+    # Dashboard tabs
+    tab1, tab2, tab3, tab4 = st.tabs(["📋 All Bookings", "👥 User Analytics", "🛠️ Equipment Analytics", "📊 Export Data"])
+    
+    with tab1:
+        st.subheader("All Bookings")
+        
+        # Filters
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            status_filter = st.selectbox("Status", ["All", "Active", "Cancelled"])
+        with col2:
+            equipment_filter = st.selectbox("Equipment", ["All"] + [e["name"] for e in EQUIPMENT_LIST])
+        with col3:
+            user_filter = st.selectbox("User", ["All"] + sorted(list(set([b["user_email"] for b in all_bookings]))))
+        with col4:
+            date_from = st.date_input("From Date", value=datetime.now().date() - timedelta(days=30))
+        
+        # Filter bookings
+        filtered_bookings = all_bookings.copy()
+        if status_filter == "Active":
+            filtered_bookings = [b for b in filtered_bookings if b["status"] != "cancelled"]
+        elif status_filter == "Cancelled":
+            filtered_bookings = [b for b in filtered_bookings if b["status"] == "cancelled"]
+        
+        if equipment_filter != "All":
+            filtered_bookings = [b for b in filtered_bookings if b["equipment_name"] == equipment_filter]
+        
+        if user_filter != "All":
+            filtered_bookings = [b for b in filtered_bookings if b["user_email"] == user_filter]
+        
+        filtered_bookings = [b for b in filtered_bookings if datetime.strptime(b["date"], "%Y-%m-%d").date() >= date_from]
+        
+        # Display as table
+        if filtered_bookings:
+            df = pd.DataFrame(filtered_bookings)
+            df = df[["date", "start_time", "end_time", "equipment_name", "user_name", "user_email", "status"]]
+            df.columns = ["Date", "Start", "End", "Equipment", "User", "Email", "Status"]
+            df = df.sort_values("Date", ascending=False)
+            st.dataframe(df, use_container_width=True, height=400)
+            st.info(f"**Total:** {len(filtered_bookings)} bookings")
+        else:
+            st.info("No bookings match the selected filters")
+    
+    with tab2:
+        st.subheader("User Analytics")
+        
+        # Get unique users
+        users = list(set([b["user_email"] for b in active_bookings]))
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("### Monthly Bookings (Last 30 Days)")
+            now = datetime.now().date()
+            thirty_days_ago = now - timedelta(days=30)
+            
+            user_monthly_stats = {}
+            for user in users:
+                count = len([b for b in active_bookings 
+                           if b["user_email"] == user 
+                           and datetime.strptime(b["date"], "%Y-%m-%d").date() >= thirty_days_ago])
+                if count > 0:
+                    user_monthly_stats[user] = count
+            
+            if user_monthly_stats:
+                monthly_df = pd.DataFrame(list(user_monthly_stats.items()), columns=["User", "Bookings"])
+                monthly_df = monthly_df.sort_values("Bookings", ascending=False)
+                st.dataframe(monthly_df, use_container_width=True, hide_index=True)
+            else:
+                st.info("No bookings in the last 30 days")
+        
+        with col2:
+            st.markdown("### Annual Bookings (Last 365 Days)")
+            one_year_ago = now - timedelta(days=365)
+            
+            user_annual_stats = {}
+            for user in users:
+                count = len([b for b in active_bookings 
+                           if b["user_email"] == user 
+                           and datetime.strptime(b["date"], "%Y-%m-%d").date() >= one_year_ago])
+                if count > 0:
+                    user_annual_stats[user] = count
+            
+            if user_annual_stats:
+                annual_df = pd.DataFrame(list(user_annual_stats.items()), columns=["User", "Bookings"])
+                annual_df = annual_df.sort_values("Bookings", ascending=False)
+                st.dataframe(annual_df, use_container_width=True, hide_index=True)
+            else:
+                st.info("No bookings in the last year")
+    
+    with tab3:
+        st.subheader("Equipment Analytics")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("### Total Bookings by Equipment")
+            equipment_stats = {}
+            for equipment in EQUIPMENT_LIST:
+                count = len([b for b in active_bookings if b["equipment_name"] == equipment["name"]])
+                equipment_stats[equipment["name"]] = count
+            
+            if equipment_stats:
+                eq_df = pd.DataFrame(list(equipment_stats.items()), columns=["Equipment", "Bookings"])
+                eq_df = eq_df.sort_values("Bookings", ascending=False)
+                st.dataframe(eq_df, use_container_width=True, hide_index=True)
+                
+                # Bar chart
+                st.bar_chart(eq_df.set_index("Equipment"))
+        
+        with col2:
+            st.markdown("### Utilisation Rate (Last 30 Days)")
+            thirty_days_ago = datetime.now().date() - timedelta(days=30)
+            
+            for equipment in EQUIPMENT_LIST:
+                recent_bookings = len([b for b in active_bookings 
+                                      if b["equipment_name"] == equipment["name"]
+                                      and datetime.strptime(b["date"], "%Y-%m-%d").date() >= thirty_days_ago])
+                st.metric(equipment["name"], f"{recent_bookings} bookings")
+    
+    with tab4:
+        st.subheader("Export Data")
+        
+        st.markdown("Download booking data as CSV for external analysis")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("### All Active Bookings")
+            if active_bookings:
+                df_export = pd.DataFrame(active_bookings)
+                csv = df_export.to_csv(index=False)
+                st.download_button(
+                    label="📥 Download Active Bookings CSV",
+                    data=csv,
+                    file_name=f"fablab_active_bookings_{datetime.now().strftime('%Y%m%d')}.csv",
+                    mime="text/csv",
+                    use_container_width=True
+                )
+            else:
+                st.info("No active bookings to export")
+        
+        with col2:
+            st.markdown("### All Bookings (Including Cancelled)")
+            if all_bookings:
+                df_all = pd.DataFrame(all_bookings)
+                csv_all = df_all.to_csv(index=False)
+                st.download_button(
+                    label="📥 Download All Bookings CSV",
+                    data=csv_all,
+                    file_name=f"fablab_all_bookings_{datetime.now().strftime('%Y%m%d')}.csv",
+                    mime="text/csv",
+                    use_container_width=True
+                )
+            else:
+                st.info("No bookings to export")
 
 
 # Main app
@@ -625,6 +815,11 @@ def main():
         st.markdown('<div class="login-container">', unsafe_allow_html=True)
         show_login_form()
         st.markdown('</div>', unsafe_allow_html=True)
+        return
+    
+    # Show admin dashboard if requested
+    if st.session_state.show_admin_dashboard and st.session_state.is_admin:
+        show_admin_dashboard()
         return
     
     # Quick stats banner

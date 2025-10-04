@@ -147,8 +147,8 @@ def show_equipment_calendar(equipment: dict):
                          if b["equipment_id"] == equipment["id"] 
                          and b["status"] != "cancelled"]
     
-    # Create calendar grid with equipment info and contact details side by side
-    header_col1, header_col2, header_col3, header_col4 = st.columns([2, 2, 2, 2])
+    # Create calendar grid with equipment info side by side
+    header_col1, header_col2, header_col3 = st.columns([3, 2, 2])
     
     with header_col1:
         st.markdown(f"### {equipment['name']}")
@@ -164,17 +164,12 @@ def show_equipment_calendar(equipment: dict):
         st.markdown("<div style='text-align: center;'>30-minute slots</div>", unsafe_allow_html=True)
         st.markdown("<div style='text-align: center;'>Max 4 hours per booking</div>", unsafe_allow_html=True)
     
-    with header_col4:
-        st.markdown("<div style='text-align: center;'><strong>📧 Email Addresses</strong></div>", unsafe_allow_html=True)
-        st.markdown("<div style='text-align: center;'><strong>Booking Manager:</strong> <a href='mailto:carl@creativespark.ie'>carl@creativespark.ie</a></div>", unsafe_allow_html=True)
-        st.markdown("<div style='text-align: center;'><strong>General Enquiries:</strong> <a href='mailto:hello@creativespark.ie'>hello@creativespark.ie</a></div>", unsafe_allow_html=True)
-    
     st.markdown("---")
     
     # Create columns for dates (scrollable)
     with st.container():
         # Date headers - aligned with time slots below
-        header_cols = st.columns([0.5] + [1] * len(dates))
+        header_cols = st.columns([0.7] + [1] * len(dates))
         
         # Empty space above time labels
         with header_cols[0]:
@@ -225,11 +220,11 @@ def show_equipment_calendar(equipment: dict):
                             <div style='background: linear-gradient(90deg, transparent, #B5C4BA 20%, #B5C4BA 80%, transparent); 
                             height: 2px; margin: 12px 0 16px 0;'></div>""", unsafe_allow_html=True)
             
-            cols = st.columns([0.5] + [1] * len(dates))
+            cols = st.columns([0.7] + [1] * len(dates))
             
             # Time label (on one line)
             with cols[0]:
-                st.markdown(f"<div style='text-align: right; padding-right: 10px; font-weight: 600; color: #4A6759; white-space: nowrap;'>{time_slot}</div>",
+                st.markdown(f"<div style='text-align: right; padding-right: 20px; font-weight: 600; color: #4A6759; white-space: nowrap;'>{time_slot}</div>",
                           unsafe_allow_html=True)
             
             # Date cells
@@ -256,12 +251,12 @@ def show_equipment_calendar(equipment: dict):
                                 break
                         
                         if booked_by_user:
-                            # Soft Amber for user's bookings
-                            st.markdown("<div style='background-color: #F3C78F; height: 35px; border-radius: 3px; cursor: not-allowed; border: 1.5px solid #E8B67F;'></div>",
+                            # Soft Coral Pink for user's bookings
+                            st.markdown("<div style='background-color: #F3C5C5; height: 35px; border-radius: 3px; cursor: not-allowed; border: 1.5px solid #E8AFA8;'></div>",
                                       unsafe_allow_html=True)
                         elif booked_by_other:
-                            # Dark Amber for other bookings
-                            st.markdown("<div style='background-color: #C68642; height: 35px; border-radius: 3px; cursor: not-allowed; border: 1.5px solid #B57838;'></div>",
+                            # Dusty Rose for other bookings
+                            st.markdown("<div style='background-color: #D4918D; height: 35px; border-radius: 3px; cursor: not-allowed; border: 1.5px solid #C17F7A;'></div>",
                                       unsafe_allow_html=True)
                         else:
                             # White with thin black border for available (clickable)
@@ -634,16 +629,11 @@ def main():
     
     # Quick stats banner
     today = datetime.now().date()
-    bookings_today = st.session_state.booking_manager.get_bookings_for_date(today.strftime("%Y-%m-%d"))
-    total_slots_today = len(generate_time_slots()) * len([d for d in get_two_week_dates() if d == today]) * len(EQUIPMENT_LIST)
-    available_today = total_slots_today - len(bookings_today)
     
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
     with col1:
         st.metric("📅 Today's Date", today.strftime("%d %B %Y"))
     with col2:
-        st.metric("✅ Available Slots Today", available_today)
-    with col3:
         st.metric("📊 Active Bookings", len([b for b in st.session_state.booking_manager.load_bookings() if b["status"] != "cancelled"]))
     
     st.markdown("---")
@@ -655,14 +645,23 @@ def main():
                 border-radius: 0px; 
                 color: #2C3E36; 
                 margin-bottom: 24px;
-                border-left: 4px solid #6B8E7F;'>
-        <h3 style='margin: 0; color: #2C3E36; font-size: 1.3rem;'>💡 Click any start time to book equipment</h3>
-        <p style='margin: 8px 0 0 0; color: #4A6759;'>
-            <span style='display: inline-block; width: 18px; height: 18px; background: white; border: 1.5px solid #6B8E7F; border-radius: 2px; vertical-align: middle;'></span> Available  |  
-            <span style='display: inline-block; width: 18px; height: 18px; background: #C68642; border-radius: 2px; vertical-align: middle;'></span> Booked by Others  |  
-            <span style='display: inline-block; width: 18px; height: 18px; background: #F3C78F; border-radius: 2px; vertical-align: middle;'></span> Your Bookings  |  
-            <span style='display: inline-block; width: 18px; height: 18px; background: #9CA3AF; border: 1.5px solid #6B7280; border-radius: 2px; vertical-align: middle;'></span> Weekend (Closed)
-        </p>
+                border-left: 4px solid #6B8E7F;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;'>
+        <div>
+            <h3 style='margin: 0; color: #2C3E36; font-size: 1.3rem;'>💡 Click any start time to book equipment</h3>
+            <p style='margin: 8px 0 0 0; color: #4A6759;'>
+                <span style='display: inline-block; width: 18px; height: 18px; background: white; border: 1.5px solid #6B8E7F; border-radius: 2px; vertical-align: middle;'></span> Available  |  
+                <span style='display: inline-block; width: 18px; height: 18px; background: #D4918D; border-radius: 2px; vertical-align: middle;'></span> Booked by Others  |  
+                <span style='display: inline-block; width: 18px; height: 18px; background: #F3C5C5; border-radius: 2px; vertical-align: middle;'></span> Your Bookings  |  
+                <span style='display: inline-block; width: 18px; height: 18px; background: #9CA3AF; border: 1.5px solid #6B7280; border-radius: 2px; vertical-align: middle;'></span> Weekend (Closed)
+            </p>
+        </div>
+        <div style='text-align: right; font-size: 0.9rem; color: #4A6759; white-space: nowrap;'>
+            <div style='margin-bottom: 4px;'><strong>Booking Manager:</strong> <a href='mailto:carl@creativespark.ie' style='color: #6B8E7F;'>carl@creativespark.ie</a></div>
+            <div><strong>General Enquiries:</strong> <a href='mailto:hello@creativespark.ie' style='color: #6B8E7F;'>hello@creativespark.ie</a></div>
+        </div>
     </div>
     """, unsafe_allow_html=True)
     

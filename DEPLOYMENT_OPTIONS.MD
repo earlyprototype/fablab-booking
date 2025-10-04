@@ -9,10 +9,10 @@ Your booking system is currently deployed on **Streamlit Cloud** (free tier). Th
 
 | Option | Cost | Reliability | Complexity | Custom Domain | Best For |
 |--------|------|-------------|------------|---------------|----------|
+| **Fly.io** ⭐ | FREE FOREVER | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ Medium | ✅ FREE | **Best free option** |
 | **Streamlit Cloud (Current)** | FREE | ⭐⭐⭐⭐ | ⭐ Easy | Paid only | Quick start |
-| **Railway** | FREE (500hrs/month) | ⭐⭐⭐⭐ | ⭐⭐ Medium | ✅ FREE | Best free option |
-| **Render** | FREE | ⭐⭐⭐⭐ | ⭐⭐ Medium | ✅ FREE | Reliable free hosting |
-| **Fly.io** | FREE (3 VMs) | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ Advanced | ✅ FREE | Power users |
+| **Render** | FREE (cold starts) | ⭐⭐⭐⭐ | ⭐⭐ Medium | ✅ FREE | Occasional use |
+| **Railway** | $5/mo after trial | ⭐⭐⭐⭐ | ⭐⭐ Medium | ✅ Yes | Trial only |
 | **Google Cloud Run** | FREE tier | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ Advanced | ✅ FREE | Enterprise-grade |
 | **Heroku** | $7/month | ⭐⭐⭐⭐ | ⭐⭐ Medium | ✅ Yes | Simple paid option |
 | **DigitalOcean** | $6/month | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ Advanced | ✅ Yes | Full control |
@@ -21,33 +21,57 @@ Your booking system is currently deployed on **Streamlit Cloud** (free tier). Th
 
 ## 🆓 FREE & RELIABLE OPTIONS (Recommended)
 
-### **Option 1: Railway.app** ⭐ RECOMMENDED
+### **Option 1: Fly.io** ⭐ RECOMMENDED - TRULY FREE FOREVER
 
-**What it is:** Modern platform-as-a-service with generous free tier
+**What it is:** Modern app hosting on global edge network with generous free tier
 
-**Free Tier:**
-- 500 hours/month (always-on: 16 days/month)
-- $5 credit monthly (enough for 24/7 small apps)
+**Free Tier (Forever):**
+- 3 VMs with 256MB RAM each (FREE FOREVER)
+- 160GB bandwidth/month
 - Custom domains FREE
+- Global CDN included
+- No cold starts (always warm)
 - Automatic HTTPS
-- GitHub auto-deploy
 
 **Setup Steps:**
-1. Create account at railway.app
-2. Connect GitHub repository
-3. Railway auto-detects Python/Streamlit
-4. Add custom domain: `booking.creativespark.ie`
-5. Done!
+1. Install flyctl CLI: `powershell -Command "iwr https://fly.io/install.ps1 -useb | iex"`
+2. Sign up: `fly auth signup` (requires credit card for verification - NOT charged)
+3. Navigate to your project folder
+4. Launch: `fly launch` (auto-detects everything)
+5. Deploy: `fly deploy`
+6. Add custom domain: `fly certs add booking.creativespark.ie`
 
-**Reliability:** ⭐⭐⭐⭐⭐ (99.9% uptime)
+**Reliability:** ⭐⭐⭐⭐⭐ (Enterprise-grade, 99.99% uptime)
 
-**Why Railway:**
-- ✅ Truly free for your use case
+**Why Fly.io:**
+- ✅ **FREE FOREVER** (not a trial)
+- ✅ No cold starts (always responsive)
 - ✅ Custom domain included
-- ✅ Auto-deploy on git push
+- ✅ Edge network (fast globally)
 - ✅ Professional infrastructure
-- ✅ Easy rollbacks
-- ✅ Environment variables secure
+- ✅ Docker-based (portable)
+- ✅ Auto-scaling
+- ✅ Zero-downtime deploys
+
+**Trade-off:**
+- Requires CLI usage (more technical than web interface)
+- Requires credit card for verification (but never charged under free limits)
+
+**Deployment Time:** 20 minutes
+
+---
+
+### **Option 2: Railway.app** ⚠️ LIMITED FREE TRIAL
+
+**What it is:** Modern platform-as-a-service with trial period
+
+**Free Tier:**
+- $5 credit for first month ONLY
+- After trial: $5/month minimum
+- Custom domains included
+- GitHub auto-deploy
+
+**⚠️ Important:** NOT free long-term - only trial period
 
 **Deployment Time:** 10 minutes
 
@@ -253,32 +277,47 @@ venv/
 
 ## 🎯 RECOMMENDATION FOR CREATIVE SPARK
 
-### **Best Option: Railway.app**
+### **Best Option: Fly.io** ⭐
 
 **Why:**
-1. ✅ **Completely FREE** for your usage
+1. ✅ **FREE FOREVER** (not a trial)
 2. ✅ **Custom domain included**: `booking.creativespark.ie`
-3. ✅ **Reliable**: Professional infrastructure
-4. ✅ **Auto-deploy**: Push to GitHub → automatic update
-5. ✅ **No cold starts**: Always responsive
-6. ✅ **Easy setup**: 10 minutes
-7. ✅ **Secure**: Environment variables, HTTPS auto
+3. ✅ **Reliable**: Enterprise-grade infrastructure (99.99% uptime)
+4. ✅ **No cold starts**: Always responsive (unlike Render)
+5. ✅ **Global edge network**: Fast for Irish and international users
+6. ✅ **Auto-deploy**: CLI or GitHub Actions
+7. ✅ **Secure**: Automatic HTTPS, environment variables
+8. ✅ **Docker-based**: Portable and professional
 
 **Limitations:**
-- 500 hours/month OR $5 credit (easily covers 24/7 for small Streamlit app)
-- If you exceed: Upgrade for $5/month (unlikely)
+- Requires credit card for verification (NOT charged under free limits)
+- CLI-based setup (20 minutes, one-time)
+- More technical than web UI options
 
 ### **Setup Process:**
-1. Sign up at railway.app with GitHub
-2. "New Project" → "Deploy from GitHub repo"
-3. Select: `earlyprototype/fablab-booking`
-4. Railway auto-detects Python
-5. Add start command: `streamlit run streamlit_app.py --server.port=$PORT --server.address=0.0.0.0`
-6. Settings → Add custom domain → `booking.creativespark.ie`
-7. Update DNS CNAME record
-8. Done!
+```powershell
+# 1. Install Fly CLI (PowerShell)
+powershell -Command "iwr https://fly.io/install.ps1 -useb | iex"
 
-**No cost, reliable, professional. Perfect for Creative Spark.**
+# 2. Sign up/login (requires credit card for verification)
+fly auth signup
+
+# 3. Navigate to your project
+cd C:\Users\Fab2\Desktop\AI\Deploy\fablab_booking
+
+# 4. Launch app (answers prompts automatically)
+fly launch --now
+
+# 5. Add custom domain
+fly certs add booking.creativespark.ie
+
+# 6. Update DNS: Add CNAME record pointing to your-app.fly.dev
+```
+
+**Total time:** 20 minutes
+**Total cost:** $0 forever
+
+**Perfect for Creative Spark - professional, reliable, truly free.**
 
 ---
 

@@ -152,21 +152,21 @@ def show_equipment_calendar(equipment: dict):
                          and b["status"] != "cancelled"]
     
     # Create calendar grid with equipment info side by side
-    header_col1, header_col2, header_col3 = st.columns([4, 2, 2])
+    header_col1, header_col2, header_col3 = st.columns([3, 2.5, 2.5])
     
     with header_col1:
         st.markdown(f"### {equipment['name']}")
         st.markdown(f"*{equipment['description']}*")
     
     with header_col2:
-        st.markdown("<div style='text-align: left;'><strong>🕐 Operating Hours</strong></div>", unsafe_allow_html=True)
-        st.markdown("<div style='text-align: left;'>Monday - Friday</div>", unsafe_allow_html=True)
-        st.markdown("<div style='text-align: left;'>9:00 AM - 5:00 PM</div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: center;'><strong>🕐 Operating Hours</strong></div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: center;'>Monday - Friday</div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: center;'>9:00 AM - 5:00 PM</div>", unsafe_allow_html=True)
     
     with header_col3:
-        st.markdown("<div style='text-align: left;'><strong>⏱️ Booking Info</strong></div>", unsafe_allow_html=True)
-        st.markdown("<div style='text-align: left;'>30-minute slots</div>", unsafe_allow_html=True)
-        st.markdown("<div style='text-align: left;'>Max 8 hours per booking</div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: center;'><strong>⏱️ Booking Info</strong></div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: center;'>30-minute slots</div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: center;'>Max 8 hours per booking</div>", unsafe_allow_html=True)
     
     st.markdown("---")
     

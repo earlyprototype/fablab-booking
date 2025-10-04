@@ -148,21 +148,21 @@ def show_equipment_calendar(equipment: dict):
                          and b["status"] != "cancelled"]
     
     # Create calendar grid with equipment info side by side
-    header_col1, header_col2, header_col3 = st.columns([3, 2, 2])
+    header_col1, header_col2, header_col3 = st.columns([4, 2, 2])
     
     with header_col1:
         st.markdown(f"### {equipment['name']}")
         st.markdown(f"*{equipment['description']}*")
     
     with header_col2:
-        st.markdown("<div style='text-align: center;'><strong>🕐 Operating Hours</strong></div>", unsafe_allow_html=True)
-        st.markdown("<div style='text-align: center;'>Monday - Friday</div>", unsafe_allow_html=True)
-        st.markdown("<div style='text-align: center;'>9:00 AM - 5:00 PM</div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: left;'><strong>🕐 Operating Hours</strong></div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: left;'>Monday - Friday</div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: left;'>9:00 AM - 5:00 PM</div>", unsafe_allow_html=True)
     
     with header_col3:
-        st.markdown("<div style='text-align: center;'><strong>⏱️ Booking Info</strong></div>", unsafe_allow_html=True)
-        st.markdown("<div style='text-align: center;'>30-minute slots</div>", unsafe_allow_html=True)
-        st.markdown("<div style='text-align: center;'>Max 4 hours per booking</div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: left;'><strong>⏱️ Booking Info</strong></div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: left;'>30-minute slots</div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: left;'>Max 8 hours per booking</div>", unsafe_allow_html=True)
     
     st.markdown("---")
     
@@ -630,11 +630,15 @@ def main():
     # Quick stats banner
     today = datetime.now().date()
     
+    # Count user's active bookings
+    user_bookings = [b for b in st.session_state.booking_manager.load_bookings() 
+                     if b["status"] != "cancelled" and b["user_email"] == st.session_state.user_email]
+    
     col1, col2 = st.columns(2)
     with col1:
         st.metric("📅 Today's Date", today.strftime("%d %B %Y"))
     with col2:
-        st.metric("📊 Active Bookings", len([b for b in st.session_state.booking_manager.load_bookings() if b["status"] != "cancelled"]))
+        st.metric("📊 My Active Bookings", len(user_bookings))
     
     st.markdown("---")
     

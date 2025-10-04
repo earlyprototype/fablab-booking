@@ -61,7 +61,7 @@ OPERATING_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 
 # Booking rules
 MIN_BOOKING_DURATION = 0.5  # hours (30 minutes)
-MAX_BOOKING_DURATION = 4  # hours
+MAX_BOOKING_DURATION = 8  # hours
 BOOKING_SLOT_INCREMENT = 0.5  # 30-minute increments
 
 # Email configuration

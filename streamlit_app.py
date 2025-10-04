@@ -471,7 +471,7 @@ def show_admin_dashboard():
     active_bookings = [b for b in all_bookings if b["status"] != "cancelled"]
     
     # Dashboard tabs
-    tab1, tab2, tab3, tab4 = st.tabs(["📋 All Bookings", "👥 User Analytics", "🛠️ Equipment Analytics", "📊 Export Data"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📋 All Bookings", "👥 User Analytics", "🛠️ Equipment Analytics", "📅 Weekly Overview", "📊 Export Data"])
     
     with tab1:
         st.subheader("All Bookings")
@@ -591,6 +591,129 @@ def show_admin_dashboard():
                 st.metric(equipment["name"], f"{recent_bookings} bookings")
     
     with tab4:
+        st.subheader("Weekly Overview Calendar")
+        st.markdown("Visual heatmap showing booking density across the week")
+        
+        # Week selector
+        col1, col2 = st.columns([1, 3])
+        with col1:
+            week_offset = st.number_input("Week offset", min_value=-4, max_value=4, value=0, help="0 = current week, -1 = last week, +1 = next week")
+        
+        # Calculate week dates
+        today = datetime.now().date()
+        # Get to Monday of current week
+        days_since_monday = today.weekday()
+        monday_this_week = today - timedelta(days=days_since_monday)
+        # Apply offset
+        target_monday = monday_this_week + timedelta(weeks=week_offset)
+        
+        # Generate weekday dates (Mon-Fri)
+        week_dates = [target_monday + timedelta(days=i) for i in range(5)]
+        
+        with col2:
+            st.info(f"**Week of:** {target_monday.strftime('%d %B %Y')} - {week_dates[-1].strftime('%d %B %Y')}")
+        
+        st.markdown("---")
+        
+        # Generate time slots
+        time_slots = []
+        current_hour = OPENING_HOUR
+        current_minute = 0
+        while current_hour < CLOSING_HOUR or (current_hour == CLOSING_HOUR and current_minute == 0):
+            time_str = f"{current_hour:02d}:{current_minute:02d}"
+            time_slots.append(time_str)
+            current_minute += 30
+            if current_minute >= 60:
+                current_minute = 0
+                current_hour += 1
+        
+        # Create heatmap data
+        st.markdown("### Booking Heatmap")
+        st.markdown("*Colour intensity shows number of bookings. Click time slot for details.*")
+        
+        # Day headers
+        header_cols = st.columns([0.8] + [1] * 5)
+        with header_cols[0]:
+            st.markdown("<div style='text-align: right; padding-right: 10px; font-weight: 700; color: #2C3E36;'>Time</div>", unsafe_allow_html=True)
+        for idx, date in enumerate(week_dates):
+            with header_cols[idx + 1]:
+                day_name = date.strftime("%a")
+                day_num = date.strftime("%d")
+                month = date.strftime("%b")
+                st.markdown(f"<div style='text-align: center; font-weight: 700; color: #2C3E36;'>{day_name}<br><small>{day_num} {month}</small></div>", unsafe_allow_html=True)
+        
+        st.markdown("---")
+        
+        # Build the calendar
+        for time_slot in time_slots:
+            cols = st.columns([0.8] + [1] * 5)
+            
+            # Time label
+            with cols[0]:
+                st.markdown(f"<div style='text-align: right; padding-right: 10px; font-weight: 600; color: #4A6759;'>{time_slot}</div>", unsafe_allow_html=True)
+            
+            # Each day
+            for idx, date in enumerate(week_dates):
+                with cols[idx + 1]:
+                    date_str = date.strftime("%Y-%m-%d")
+                    day_name = date.strftime("%a")
+                    
+                    # Count bookings for this slot
+                    slot_bookings = [b for b in active_bookings 
+                                    if b["date"] == date_str and b["start_time"] == time_slot]
+                    
+                    booking_count = len(slot_bookings)
+                    
+                    # Determine colour based on count
+                    if booking_count == 0:
+                        bg_color = "#FFFFFF"
+                        border_color = "#D4DDD7"
+                        text_color = "#9CA3AF"
+                    elif booking_count == 1:
+                        bg_color = "#F9E8E8"
+                        border_color = "#F3C5C5"
+                        text_color = "#4A6759"
+                    elif booking_count == 2:
+                        bg_color = "#F3C5C5"
+                        border_color = "#E8AFA8"
+                        text_color = "#2C3E36"
+                    elif booking_count == 3:
+                        bg_color = "#E8AFA8"
+                        border_color = "#D4918D"
+                        text_color = "#2C3E36"
+                    else:  # 4+
+                        bg_color = "#D4918D"
+                        border_color = "#C17F7A"
+                        text_color = "#FFFFFF"
+                    
+                    # Display cell with expander for details
+                    if booking_count > 0:
+                        with st.expander(f"{booking_count}", expanded=False):
+                            for booking in slot_bookings:
+                                st.markdown(f"**{booking['equipment_name']}**")
+                                st.markdown(f"👤 {booking['user_name']}")
+                                st.markdown(f"📧 {booking['user_email']}")
+                                st.markdown(f"⏰ {booking['start_time']} - {booking['end_time']}")
+                                st.markdown("---")
+                    else:
+                        st.markdown(f"<div style='background-color: {bg_color}; height: 35px; border-radius: 3px; border: 1px solid {border_color}; display: flex; align-items: center; justify-content: center; color: {text_color}; font-size: 0.8rem;'>-</div>", unsafe_allow_html=True)
+        
+        # Legend
+        st.markdown("---")
+        st.markdown("### Legend")
+        legend_cols = st.columns(5)
+        with legend_cols[0]:
+            st.markdown("⬜ **0** - Available")
+        with legend_cols[1]:
+            st.markdown("🟨 **1** - Light usage")
+        with legend_cols[2]:
+            st.markdown("🟧 **2** - Moderate")
+        with legend_cols[3]:
+            st.markdown("🟥 **3** - Busy")
+        with legend_cols[4]:
+            st.markdown("🔴 **4+** - Very busy")
+    
+    with tab5:
         st.subheader("Export Data")
         
         st.markdown("Download booking data as CSV for external analysis")

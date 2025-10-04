@@ -591,8 +591,8 @@ def show_admin_dashboard():
                 st.metric(equipment["name"], f"{recent_bookings} bookings")
     
     with tab4:
-        st.subheader("Weekly Overview Calendar")
-        st.markdown("Visual heatmap showing booking density across the week")
+        st.subheader("Weekly Equipment Schedule")
+        st.markdown("Visual timeline showing when each machine is booked")
         
         # Week selector
         col1, col2 = st.columns([1, 3])
@@ -601,13 +601,9 @@ def show_admin_dashboard():
         
         # Calculate week dates
         today = datetime.now().date()
-        # Get to Monday of current week
         days_since_monday = today.weekday()
         monday_this_week = today - timedelta(days=days_since_monday)
-        # Apply offset
         target_monday = monday_this_week + timedelta(weeks=week_offset)
-        
-        # Generate weekday dates (Mon-Fri)
         week_dates = [target_monday + timedelta(days=i) for i in range(5)]
         
         with col2:
@@ -615,103 +611,71 @@ def show_admin_dashboard():
         
         st.markdown("---")
         
-        # Generate time slots
-        time_slots = []
-        current_hour = OPENING_HOUR
-        current_minute = 0
-        while current_hour < CLOSING_HOUR or (current_hour == CLOSING_HOUR and current_minute == 0):
-            time_str = f"{current_hour:02d}:{current_minute:02d}"
-            time_slots.append(time_str)
-            current_minute += 30
-            if current_minute >= 60:
-                current_minute = 0
-                current_hour += 1
+        # Color palette for different users
+        user_colors = {}
+        color_palette = ["#F3C5C5", "#D4918D", "#B8CADB", "#95B3A8", "#E8B4A0", "#C68968"]
         
-        # Create heatmap data
-        st.markdown("### Booking Heatmap")
-        st.markdown("*Colour intensity shows number of bookings. Click time slot for details.*")
-        
-        # Day headers
-        header_cols = st.columns([0.8] + [1] * 5)
-        with header_cols[0]:
-            st.markdown("<div style='text-align: right; padding-right: 10px; font-weight: 700; color: #2C3E36;'>Time</div>", unsafe_allow_html=True)
-        for idx, date in enumerate(week_dates):
-            with header_cols[idx + 1]:
-                day_name = date.strftime("%a")
-                day_num = date.strftime("%d")
-                month = date.strftime("%b")
-                st.markdown(f"<div style='text-align: center; font-weight: 700; color: #2C3E36;'>{day_name}<br><small>{day_num} {month}</small></div>", unsafe_allow_html=True)
-        
-        st.markdown("---")
-        
-        # Build the calendar
-        for time_slot in time_slots:
-            cols = st.columns([0.8] + [1] * 5)
+        # For each equipment, show a timeline for each day
+        for equipment in EQUIPMENT_LIST:
+            st.markdown(f"### {equipment['icon']} {equipment['name']}")
             
-            # Time label
-            with cols[0]:
-                st.markdown(f"<div style='text-align: right; padding-right: 10px; font-weight: 600; color: #4A6759;'>{time_slot}</div>", unsafe_allow_html=True)
+            # Create columns for each day
+            day_cols = st.columns(5)
             
-            # Each day
-            for idx, date in enumerate(week_dates):
-                with cols[idx + 1]:
+            for day_idx, date in enumerate(week_dates):
+                with day_cols[day_idx]:
                     date_str = date.strftime("%Y-%m-%d")
-                    day_name = date.strftime("%a")
+                    day_name = date.strftime("%a %d")
                     
-                    # Count bookings for this slot
-                    slot_bookings = [b for b in active_bookings 
-                                    if b["date"] == date_str and b["start_time"] == time_slot]
+                    st.markdown(f"<div style='text-align: center; font-weight: 600; color: #2C3E36; margin-bottom: 8px;'>{day_name}</div>", unsafe_allow_html=True)
                     
-                    booking_count = len(slot_bookings)
+                    # Get bookings for this equipment on this day
+                    day_bookings = [b for b in active_bookings 
+                                   if b["equipment_name"] == equipment["name"] 
+                                   and b["date"] == date_str]
                     
-                    # Determine colour based on count
-                    if booking_count == 0:
-                        bg_color = "#FFFFFF"
-                        border_color = "#D4DDD7"
-                        text_color = "#9CA3AF"
-                    elif booking_count == 1:
-                        bg_color = "#F9E8E8"
-                        border_color = "#F3C5C5"
-                        text_color = "#4A6759"
-                    elif booking_count == 2:
-                        bg_color = "#F3C5C5"
-                        border_color = "#E8AFA8"
-                        text_color = "#2C3E36"
-                    elif booking_count == 3:
-                        bg_color = "#E8AFA8"
-                        border_color = "#D4918D"
-                        text_color = "#2C3E36"
-                    else:  # 4+
-                        bg_color = "#D4918D"
-                        border_color = "#C17F7A"
-                        text_color = "#FFFFFF"
-                    
-                    # Display cell with expander for details
-                    if booking_count > 0:
-                        with st.expander(f"{booking_count}", expanded=False):
-                            for booking in slot_bookings:
-                                st.markdown(f"**{booking['equipment_name']}**")
-                                st.markdown(f"👤 {booking['user_name']}")
+                    if day_bookings:
+                        # Sort by start time
+                        day_bookings.sort(key=lambda x: x["start_time"])
+                        
+                        for booking in day_bookings:
+                            # Assign consistent color to user
+                            user_email = booking["user_email"]
+                            if user_email not in user_colors:
+                                user_colors[user_email] = color_palette[len(user_colors) % len(color_palette)]
+                            
+                            bg_color = user_colors[user_email]
+                            
+                            # Create booking block
+                            with st.expander(f"{booking['start_time']}-{booking['end_time']}", expanded=False):
+                                st.markdown(f"**👤 {booking['user_name']}**")
                                 st.markdown(f"📧 {booking['user_email']}")
                                 st.markdown(f"⏰ {booking['start_time']} - {booking['end_time']}")
-                                st.markdown("---")
+                                
+                            # Visual block representation
+                            st.markdown(f"""
+                            <div style='background-color: {bg_color}; 
+                                        padding: 6px; 
+                                        border-radius: 4px; 
+                                        margin-bottom: 4px;
+                                        border-left: 4px solid {user_colors[user_email]};
+                                        font-size: 0.75rem;
+                                        color: #2C3E36;'>
+                                <strong>{booking['start_time'][:5]}</strong> - <strong>{booking['end_time'][:5]}</strong><br>
+                                <small>{booking['user_name'][:20]}</small>
+                            </div>
+                            """, unsafe_allow_html=True)
                     else:
-                        st.markdown(f"<div style='background-color: {bg_color}; height: 35px; border-radius: 3px; border: 1px solid {border_color}; display: flex; align-items: center; justify-content: center; color: {text_color}; font-size: 0.8rem;'>-</div>", unsafe_allow_html=True)
+                        st.markdown("<div style='text-align: center; color: #9CA3AF; padding: 20px; background: #F5F7F5; border-radius: 4px; margin-top: 8px;'>Available</div>", unsafe_allow_html=True)
+            
+            st.markdown("---")
         
-        # Legend
-        st.markdown("---")
-        st.markdown("### Legend")
-        legend_cols = st.columns(5)
-        with legend_cols[0]:
-            st.markdown("⬜ **0** - Available")
-        with legend_cols[1]:
-            st.markdown("🟨 **1** - Light usage")
-        with legend_cols[2]:
-            st.markdown("🟧 **2** - Moderate")
-        with legend_cols[3]:
-            st.markdown("🟥 **3** - Busy")
-        with legend_cols[4]:
-            st.markdown("🔴 **4+** - Very busy")
+        # User color legend
+        if user_colors:
+            st.markdown("### 👥 User Colour Legend")
+            legend_text = " | ".join([f"<span style='color: {color}; font-weight: bold;'>●</span> {email}" 
+                                     for email, color in list(user_colors.items())[:6]])
+            st.markdown(legend_text, unsafe_allow_html=True)
     
     with tab5:
         st.subheader("Export Data")
